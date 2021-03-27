@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 void main() {
   runApp(MyApp());
@@ -25,6 +27,8 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  static String _api = "https://api.github.com/users/mon7792";
+  String _result = "E";
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -67,7 +71,7 @@ class _HomeState extends State<Home> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: new Text("RESULT"),
+          title: new Text(_result),
         );
       },
     );
@@ -75,19 +79,20 @@ class _HomeState extends State<Home> {
 
   // sendButtonPressed takes the image and post it to the az-face call.
   void sendButtonPressed() async {
-    print("SEND THE DATA TO AZURE");
-    // var url = Uri.parse(_api + _controller.text);
-    // var response = await http.get(url);
-    // // TODO: WORK on THE RESPONSE BODY
-    // if (response.statusCode == 200) {
-    //   setState(() {
-    //     _result = response.body.toString();
-    //   });
-    // } else {
-    //   setState(() {
-    //     _result = "no user.";
-    //   });
-    // }
+    var url = Uri.parse(_api);
+    var response = await http.get(url);
+    String _processLogin = "no user";
+
+    if (response.statusCode == 200) {
+      var obj = jsonDecode(response.body.toString());
+      _processLogin = obj["login"];
+    } else {
+      _processLogin = "no user.";
+    }
+
+    setState(() {
+      _result = _processLogin;
+    });
 
     showAlert(context);
   }
