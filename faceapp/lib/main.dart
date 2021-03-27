@@ -11,15 +11,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
+        brightness: Brightness.dark,
         primarySwatch: Colors.blue,
       ),
       home: Home(),
@@ -27,7 +19,12 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class Home extends StatelessWidget {
+class Home extends StatefulWidget {
+  @override
+  _HomeState createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,9 +33,62 @@ class Home extends StatelessWidget {
       ),
       body: Container(
         child: Center(
-          child: Text('Hello World'),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Image(
+                  image: AssetImage('images/rdj-face.jpeg'),
+                  height: 400.0,
+                  width: 300.0,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: MaterialButton(
+                  shape: CircleBorder(),
+                  color: Colors.red,
+                  padding: EdgeInsets.all(20),
+                  onPressed: sendButtonPressed,
+                  child: Icon(Icons.send, size: 50),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
+  }
+
+  // showAlert will display the result on sending the request.
+  showAlert(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: new Text("RESULT"),
+        );
+      },
+    );
+  }
+
+  // sendButtonPressed takes the image and post it to the az-face call.
+  void sendButtonPressed() async {
+    print("SEND THE DATA TO AZURE");
+    // var url = Uri.parse(_api + _controller.text);
+    // var response = await http.get(url);
+    // // TODO: WORK on THE RESPONSE BODY
+    // if (response.statusCode == 200) {
+    //   setState(() {
+    //     _result = response.body.toString();
+    //   });
+    // } else {
+    //   setState(() {
+    //     _result = "no user.";
+    //   });
+    // }
+
+    showAlert(context);
   }
 }
