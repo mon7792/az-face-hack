@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+
+import 'package:faceapp/utils/post.dart';
+import 'package:flutter/services.dart';
 
 void main() {
   runApp(MyApp());
@@ -79,21 +80,38 @@ class _HomeState extends State<Home> {
 
   // sendButtonPressed takes the image and post it to the az-face call.
   void sendButtonPressed() async {
-    var url = Uri.parse(_api);
-    var response = await http.get(url);
-    String _processLogin = "no user";
+    ByteData data = await getFileData('images/rdj-face.jpeg');
+    List<int> bytes =
+        data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
 
-    if (response.statusCode == 200) {
-      var obj = jsonDecode(response.body.toString());
-      _processLogin = obj["login"];
+    var result = await Utils().registerFace(bytes);
+    if (result.statusCode == 200) {
+      print(result.body.toString());
     } else {
-      _processLogin = "no user.";
+      print("ERORR");
+      print(result.statusCode);
+      print(result.body);
     }
+    print("button Pressed");
+    // var url = Uri.parse(_api);
+    // // var response = await http.get(url);
+    // // String _processLogin = "no user";
 
-    setState(() {
-      _result = _processLogin;
-    });
+    // // if (response.statusCode == 200) {
+    // //   var obj = jsonDecode(response.body.toString());
+    // //   _processLogin = obj["login"];
+    // // } else {
+    // //   _processLogin = "no user.";
+    // // }
 
-    showAlert(context);
+    // // setState(() {
+    // //   _result = _processLogin;
+    // // });
+
+    // showAlert(context);
+  }
+
+  Future<ByteData> getFileData(String path) async {
+    return await rootBundle.load(path);
   }
 }
