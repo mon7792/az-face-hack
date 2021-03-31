@@ -1,14 +1,39 @@
+import 'package:faceapp/camera.dart';
 import 'package:flutter/material.dart';
 
 import 'package:faceapp/utils/post.dart';
 import 'package:flutter/services.dart';
 
-void main() {
-  runApp(MyApp());
+import 'package:camera/camera.dart';
+
+Future<void> main() async {
+  // initialize plugin service.
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // obtain the list of available camera.
+  final cameras = await availableCameras();
+
+  // select the front camera.
+  CameraDescription selCam;
+
+  for (int i = 0; i < cameras.length; i++) {
+    var cam = cameras[i].lensDirection;
+    if (cam == CameraLensDirection.front) {
+      selCam = cameras[i];
+    }
+  }
+
+  runApp(MyApp(camera: selCam));
 }
 
-class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
+class MyApp extends StatefulWidget {
+  final CameraDescription camera;
+  const MyApp({Key key, @required this.camera}) : super(key: key);
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -17,12 +42,14 @@ class MyApp extends StatelessWidget {
         brightness: Brightness.dark,
         primarySwatch: Colors.blue,
       ),
-      home: Home(),
+      home: Home(camera: widget.camera),
     );
   }
 }
 
 class Home extends StatefulWidget {
+  final CameraDescription camera;
+  const Home({Key key, @required this.camera}) : super(key: key);
   @override
   _HomeState createState() => _HomeState();
 }
@@ -43,10 +70,8 @@ class _HomeState extends State<Home> {
             children: <Widget>[
               Padding(
                 padding: const EdgeInsets.all(10.0),
-                child: Image(
-                  image: AssetImage('images/rdj-face.jpeg'),
-                  height: 400.0,
-                  width: 300.0,
+                child: CaptureImage(
+                  camera: widget.camera,
                 ),
               ),
               Padding(
