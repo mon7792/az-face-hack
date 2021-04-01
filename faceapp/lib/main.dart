@@ -14,16 +14,19 @@ Future<void> main() async {
   final cameras = await availableCameras();
 
   // select the front camera.
-  CameraDescription selCam;
+  CameraDescription cm;
 
   for (int i = 0; i < cameras.length; i++) {
     var cam = cameras[i].lensDirection;
     if (cam == CameraLensDirection.front) {
-      selCam = cameras[i];
+      cm = cameras[i];
     }
   }
 
-  runApp(MyApp(camera: selCam));
+  final CameraDescription selCam = cm;
+  var myApp = MyApp(camera: selCam);
+
+  runApp(myApp);
 }
 
 class MyApp extends StatefulWidget {
@@ -42,7 +45,12 @@ class _MyAppState extends State<MyApp> {
         brightness: Brightness.dark,
         primarySwatch: Colors.blue,
       ),
-      home: Home(camera: widget.camera),
+      // home: Home(camera: widget.camera),
+      home: Scaffold(
+        body: CaptureImage(
+          camera: widget.camera,
+        ),
+      ),
     );
   }
 }
@@ -59,6 +67,9 @@ class _HomeState extends State<Home> {
   String _result = "E";
   @override
   Widget build(BuildContext context) {
+    final CaptureImage cameraWidget = CaptureImage(
+      camera: widget.camera,
+    );
     return Scaffold(
       appBar: AppBar(
         title: Text('FACES'),
@@ -70,9 +81,7 @@ class _HomeState extends State<Home> {
             children: <Widget>[
               Padding(
                 padding: const EdgeInsets.all(10.0),
-                child: CaptureImage(
-                  camera: widget.camera,
-                ),
+                child: cameraWidget,
               ),
               Padding(
                 padding: const EdgeInsets.all(10.0),
@@ -102,6 +111,8 @@ class _HomeState extends State<Home> {
       },
     );
   }
+
+  void displayImagePath(CaptureImage ct) async {}
 
   // sendButtonPressed takes the image and post it to the az-face call.
   void sendButtonPressed() async {

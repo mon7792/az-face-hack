@@ -1,4 +1,5 @@
 import 'package:camera/camera.dart';
+import 'package:faceapp/process_image.dart';
 import 'package:flutter/material.dart';
 
 class CaptureImage extends StatefulWidget {
@@ -30,18 +31,64 @@ class _CaptureImageState extends State<CaptureImage> {
     super.dispose();
   }
 
+  Future<String> captureImagePath() async {
+    XFile image;
+    try {
+      await _initializeControllerFuture;
+      image = await _cameraController.takePicture();
+    } catch (e) {
+      print(e);
+    }
+    return image?.path;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<void>(
-        future: _initializeControllerFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            return CameraPreview(_cameraController);
-          } else {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-        });
+    return Column(
+      children: <Widget>[
+        // Camera.
+        FutureBuilder<void>(
+            future: _initializeControllerFuture,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.done) {
+                return CameraPreview(_cameraController);
+              } else {
+                return Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+            }),
+        // sumbit button.
+        Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: MaterialButton(
+            shape: CircleBorder(),
+            color: Colors.red,
+            padding: EdgeInsets.all(20),
+            onPressed: () async {
+              XFile image;
+              try {
+                await _initializeControllerFuture;
+                image = await _cameraController.takePicture();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ProcessImage(
+                      // Pass the automatically generated path to
+                      // the DisplayPictureScreen widget.
+                      imagePath: image?.path,
+                    ),
+                  ),
+                );
+              } catch (e) {
+                print(e);
+              }
+              print(image?.path);
+            },
+            child: Icon(Icons.send, size: 50),
+          ),
+        ),
+      ],
+    );
   }
 }
