@@ -46,4 +46,4 @@ faceapp/android/app/profile
 faceapp/android/app/release
 
 # run script
-./run.sh
+*.sh
