@@ -3,6 +3,7 @@ package api
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -19,9 +20,11 @@ type respBody struct {
 // src URL : https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/Robert_Downey_Jr_2014_Comic_Con_%28cropped%29.jpg/423px-Robert_Downey_Jr_2014_Comic_Con_%28cropped%29.jpg
 // "Content-Type": "application/octet-stream",
 // faceDectRequest via URL
-func faceDectRequestViaURL(imgURL string) (string, error) {
+func (ap *httpAPI) faceDectRequestViaURL(imgURL string) (string, error) {
 
 	uri := "https://az-hack-face.cognitiveservices.azure.com/face/v1.0/detect"
+
+	uri = fmt.Sprintf("%s%s", ap.azFaceHostname, ap.azFaceDetectName)
 
 	var data reqBody
 	data.URL = imgURL
@@ -59,7 +62,7 @@ func faceDectRequestViaURL(imgURL string) (string, error) {
 // src URL : https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/Robert_Downey_Jr_2014_Comic_Con_%28cropped%29.jpg/423px-Robert_Downey_Jr_2014_Comic_Con_%28cropped%29.jpg
 // "Content-Type": "application/octet-stream",
 // faceDectRequestviaFile
-func faceDectRequestViaFile(fileBytes []byte) (string, error) {
+func (ap *httpAPI) faceDectRequestViaFile(fileBytes []byte) (string, error) {
 
 	uri := "https://az-hack-face.cognitiveservices.azure.com/face/v1.0/detect"
 
@@ -100,7 +103,7 @@ type respVerifyBody struct {
 }
 
 // {"isIdentical":true,"confidence":1.0}
-func faceCompareRequest(srcFaceID, cmpFaceID string) (bool, error) {
+func (ap *httpAPI) faceCompareRequest(srcFaceID, cmpFaceID string) (bool, error) {
 	uri := "https://az-hack-face.cognitiveservices.azure.com/face/v1.0/verify"
 
 	var data reqVerifyBody

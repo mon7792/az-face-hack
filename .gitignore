@@ -44,3 +44,6 @@ faceapp/app.*.map.json
 faceapp/android/app/debug
 faceapp/android/app/profile
 faceapp/android/app/release
+
+# run script
+run.sh

@@ -4,12 +4,12 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 
-	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi"
 )
 
+// verify response status to the client
 const (
 	okStatusRsp    = `{"status": "ok"}`
 	nokStatusRsp   = `{"status": "nok"}`
@@ -21,21 +21,52 @@ var dummyUUIDSrcImgStore = map[string]string{
 	"rdj-01": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/Robert_Downey_Jr_2014_Comic_Con_%28cropped%29.jpg/423px-Robert_Downey_Jr_2014_Comic_Con_%28cropped%29.jpg",
 }
 
+// HttpOptions docs.
+type HttpOptions struct {
+	Router           chi.Router
+	AzFaceHostname   string
+	AzFaceDetectName string
+	AzFaceVerifyName string
+	AzFaceKeyName    string
+	PortNo           string
+}
+
+type httpAPI struct {
+	r                chi.Router
+	azFaceHostname   string
+	azFaceDetectName string
+	azFaceVerifyName string
+	azFaceKeyName    string
+}
+
+// HttpAPIInterface exposes the http handlers.
+type HttpAPIInterface interface {
+	HandleRequests()
+}
+
+// NewHTTPAPI contructor to access the face api functionality.
+func NewHTTPAPI(opt *HttpOptions) HttpAPIInterface {
+
+	return &httpAPI{r: opt.Router,
+		azFaceHostname:   opt.AzFaceHostname,
+		azFaceDetectName: opt.AzFaceDetectName,
+		azFaceVerifyName: opt.AzFaceVerifyName,
+		azFaceKeyName:    opt.AzFaceKeyName}
+}
+
 // HandleRequests handles all the request.
-func HandleRequests() {
-	r := chi.NewRouter()
-	r.Get("/", homePage)
-	r.Post("/verify", verifyPage)
-	log.Fatal(http.ListenAndServe(":8080", r))
+func (ap *httpAPI) HandleRequests() {
+	ap.r.Get("/", ap.homePage)
+	ap.r.Post("/verify", ap.verifyPage)
 }
 
 // homePage docs.
-func homePage(w http.ResponseWriter, r *http.Request) {
+func (ap *httpAPI) homePage(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "az-face-hack api")
 }
 
 // verify page.
-func verifyPage(w http.ResponseWriter, r *http.Request) {
+func (ap *httpAPI) verifyPage(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseMultipartForm(32 << 20); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -76,21 +107,21 @@ func verifyPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 4. get the faceID for source image.
-	srcFaceID, err := faceDectRequestViaURL(srcImgURL)
+	srcFaceID, err := ap.faceDectRequestViaURL(srcImgURL)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	// 5. get the faceID for compare image.
-	cmpFaceID, err := faceDectRequestViaFile(imgBuf.Bytes())
+	cmpFaceID, err := ap.faceDectRequestViaFile(imgBuf.Bytes())
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	// 6. verify the two faces.
-	match, err := faceCompareRequest(srcFaceID, cmpFaceID)
+	match, err := ap.faceCompareRequest(srcFaceID, cmpFaceID)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return

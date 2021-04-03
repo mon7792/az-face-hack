@@ -1,25 +1,35 @@
 package main
 
 import (
-	"fmt"
 	"log"
+	"net/http"
 	"os"
 
 	"example.com/api"
+	"github.com/go-chi/chi"
 )
 
 func main() {
-	fmt.Println("API STARTING...")
-	// GET THE LIST OF ENVIRONMENT VARIABLE
-	// 1. PORT NUMBER
-	portNo := getEnv("PORT_NO")
-	// 2. FACE API URL HOST
-	// 3. FACE API DETECT URL
-	// 4. FACE API VERIFY URL
-	// 5. FACE API KEY
-	log.Println("LISTENING:", portNo)
+	log.Println("API STARTING...")
 
-	api.HandleRequests()
+	//  Start the router.
+	r := chi.NewRouter()
+	// GET THE LIST OF ENVIRONMENT VARIABLE
+	httpOpts := &api.HttpOptions{
+		Router:           r,
+		AzFaceHostname:   getEnv("AZ_FACE_HOST_NAME"),
+		AzFaceDetectName: getEnv("AZ_FACE_DETECT_URI_NAME"),
+		AzFaceVerifyName: getEnv("AZ_FACE_VERIFY_URI_NAME"),
+		AzFaceKeyName:    getEnv("AZ_FACE_KEY_NAME"),
+		PortNo:           getEnv("AZ_FACE_PORT_NO"),
+	}
+
+	// add the handler
+	api.NewHTTPAPI(httpOpts).HandleRequests()
+
+	log.Println("LISTENING:", httpOpts.PortNo)
+	// listen.
+	log.Fatal(http.ListenAndServe(":"+httpOpts.PortNo, r))
 }
 
 // getEnv returns the env var val if set else panic
