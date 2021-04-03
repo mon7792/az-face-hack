@@ -22,9 +22,7 @@ type respBody struct {
 // faceDectRequest via URL
 func (ap *httpAPI) faceDectRequestViaURL(imgURL string) (string, error) {
 
-	uri := "https://az-hack-face.cognitiveservices.azure.com/face/v1.0/detect"
-
-	uri = fmt.Sprintf("%s%s", ap.azFaceHostname, ap.azFaceDetectName)
+	uri := fmt.Sprintf("%s%s", ap.azFaceHostname, ap.azFaceDetectName)
 
 	var data reqBody
 	data.URL = imgURL
@@ -38,7 +36,7 @@ func (ap *httpAPI) faceDectRequestViaURL(imgURL string) (string, error) {
 		return "", err
 	}
 	req.Header.Add("Content-Type", "application/json")
-	req.Header.Add("Ocp-Apim-Subscription-Key", "ef82d2be98d04d18b437fb64bbc1949f")
+	req.Header.Add("Ocp-Apim-Subscription-Key", ap.azFaceKeyName)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -64,14 +62,14 @@ func (ap *httpAPI) faceDectRequestViaURL(imgURL string) (string, error) {
 // faceDectRequestviaFile
 func (ap *httpAPI) faceDectRequestViaFile(fileBytes []byte) (string, error) {
 
-	uri := "https://az-hack-face.cognitiveservices.azure.com/face/v1.0/detect"
+	uri := fmt.Sprintf("%s%s", ap.azFaceHostname, ap.azFaceDetectName)
 
 	req, err := http.NewRequest(http.MethodPost, uri, bytes.NewBuffer(fileBytes))
 	if err != nil {
 		return "", err
 	}
 	req.Header.Add("Content-Type", "application/octet-stream")
-	req.Header.Add("Ocp-Apim-Subscription-Key", "ef82d2be98d04d18b437fb64bbc1949f")
+	req.Header.Add("Ocp-Apim-Subscription-Key", ap.azFaceKeyName)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -104,7 +102,7 @@ type respVerifyBody struct {
 
 // {"isIdentical":true,"confidence":1.0}
 func (ap *httpAPI) faceCompareRequest(srcFaceID, cmpFaceID string) (bool, error) {
-	uri := "https://az-hack-face.cognitiveservices.azure.com/face/v1.0/verify"
+	uri := fmt.Sprintf("%s%s", ap.azFaceHostname, ap.azFaceVerifyName)
 
 	var data reqVerifyBody
 	data.FaceID1 = srcFaceID
@@ -119,7 +117,7 @@ func (ap *httpAPI) faceCompareRequest(srcFaceID, cmpFaceID string) (bool, error)
 		return false, err
 	}
 	req.Header.Add("Content-Type", "application/json")
-	req.Header.Add("Ocp-Apim-Subscription-Key", "ef82d2be98d04d18b437fb64bbc1949f")
+	req.Header.Add("Ocp-Apim-Subscription-Key", ap.azFaceKeyName)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
