@@ -63,7 +63,6 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  static String _api = "https://api.github.com/users/mon7792";
   String _result = "E";
   @override
   Widget build(BuildContext context) {

@@ -11,14 +11,14 @@ class ProcessImage extends StatefulWidget {
 }
 
 class _ProcessImageState extends State<ProcessImage> {
-  @override
-  void initState() {
-    sendButtonPressed(widget.imagePath);
-    super.initState();
-  }
+  // @override
+  // void initState() {
+  //   super.initState();
+  // }
 
   @override
   Widget build(BuildContext context) {
+    sendButtonPressed(widget.imagePath, context);
     return Scaffold(
       appBar: AppBar(
         title: Text('Process Image'),
@@ -28,33 +28,32 @@ class _ProcessImageState extends State<ProcessImage> {
   }
 }
 
-void sendButtonPressed(String filePath) async {
+void sendButtonPressed(String filePath, BuildContext context) async {
   var data = File(filePath);
   List<int> bytes = data.readAsBytesSync();
 
+  String respResult = "in progress";
   var result = await Utils().registerFace(bytes);
   if (result.statusCode == 200) {
-    print(result.body.toString());
+    respResult = result.body.toString();
+    print(respResult);
   } else {
     print("ERORR");
     print(result.statusCode);
     print(result.body);
   }
   print("button Pressed");
-  // var url = Uri.parse(_api);
-  // // var response = await http.get(url);
-  // // String _processLogin = "no user";
+  showAlert(context, respResult);
+}
 
-  // // if (response.statusCode == 200) {
-  // //   var obj = jsonDecode(response.body.toString());
-  // //   _processLogin = obj["login"];
-  // // } else {
-  // //   _processLogin = "no user.";
-  // // }
-
-  // // setState(() {
-  // //   _result = _processLogin;
-  // // });
-
-  // showAlert(context);
+// showAlert will display the result on sending the request.
+showAlert(BuildContext context, String result) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: new Text(result),
+      );
+    },
+  );
 }
