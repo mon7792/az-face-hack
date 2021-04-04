@@ -1,0 +1,21 @@
+version: '3.3'
+
+services:
+  facerecon_api:
+    container_name: facerecon_api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - PYTHONUNBUFFERED=1
+      - PYTHONIOENCODING=UTF-8
+    # network_mode: "host"
+    ports:
+      - '5000:5000'
+    volumes:
+      - type: bind
+        source: .
+        target: /home/srijan/Facerecon_API
+    command:
+      ["gunicorn","--timeout" ,"1000" , "--bind", "0.0.0.0:5000", "main:app"]
+    restart: unless-stopped

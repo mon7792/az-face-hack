@@ -47,3 +47,6 @@ faceapp/android/app/release
 
 # run script
 *.sh
+
+
+faceai/model_path/*
