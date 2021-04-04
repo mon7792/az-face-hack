@@ -13,6 +13,7 @@ class CaptureImage extends StatefulWidget {
 class _CaptureImageState extends State<CaptureImage> {
   CameraController _cameraController;
   Future<void> _initializeControllerFuture;
+  final TextEditingController _controller = TextEditingController();
 
   @override
   void initState() {
@@ -44,7 +45,8 @@ class _CaptureImageState extends State<CaptureImage> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return ListView(
+      padding: const EdgeInsets.all(8),
       children: <Widget>[
         // Camera.
         FutureBuilder<void>(
@@ -58,6 +60,13 @@ class _CaptureImageState extends State<CaptureImage> {
                 );
               }
             }),
+        // Input button.
+        Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: TextField(
+            controller: _controller,
+          ),
+        ),
         // sumbit button.
         Padding(
           padding: const EdgeInsets.all(10.0),
@@ -77,6 +86,7 @@ class _CaptureImageState extends State<CaptureImage> {
                       // Pass the automatically generated path to
                       // the DisplayPictureScreen widget.
                       imagePath: image?.path,
+                      profName: _controller.text,
                     ),
                   ),
                 );

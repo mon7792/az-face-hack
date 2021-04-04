@@ -5,20 +5,17 @@ import 'package:flutter/material.dart';
 
 class ProcessImage extends StatefulWidget {
   final String imagePath;
-  const ProcessImage({Key key, this.imagePath}) : super(key: key);
+  final String profName;
+  const ProcessImage({Key key, this.imagePath, this.profName})
+      : super(key: key);
   @override
   _ProcessImageState createState() => _ProcessImageState();
 }
 
 class _ProcessImageState extends State<ProcessImage> {
-  // @override
-  // void initState() {
-  //   super.initState();
-  // }
-
   @override
   Widget build(BuildContext context) {
-    sendButtonPressed(widget.imagePath, context);
+    sendButtonPressed(widget.imagePath, widget.profName, context);
     return Scaffold(
       appBar: AppBar(
         title: Text('Process Image'),
@@ -28,21 +25,19 @@ class _ProcessImageState extends State<ProcessImage> {
   }
 }
 
-void sendButtonPressed(String filePath, BuildContext context) async {
+void sendButtonPressed(
+    String filePath, String profName, BuildContext context) async {
   var data = File(filePath);
   List<int> bytes = data.readAsBytesSync();
 
   String respResult = "in progress";
-  var result = await Utils().registerFace(bytes);
-  if (result.statusCode == 200) {
-    respResult = result.body.toString();
-    print(respResult);
+  String result = await Utils().registerFace(bytes, profName);
+
+  if (result == "True") {
+    respResult = "Your Attendance has been logged";
   } else {
-    print("ERORR");
-    print(result.statusCode);
-    print(result.body);
+    respResult = "System couldn't verify your entry. please retry !";
   }
-  print("button Pressed");
   showAlert(context, respResult);
 }
 

@@ -1,26 +1,21 @@
 import 'package:http/http.dart' as http;
 
 class Utils {
-  Future<http.Response> registerFace(dynamic faceBytes) async {
-    var url = Uri.parse("https://az-face-hack.azurewebsites.net/verify");
-    http.Response response = await http.post(
-      url,
-      body: faceBytes,
-    );
+  Future<String> registerFace(dynamic faceBytes, String profName) async {
+    var url = Uri.parse(
+        "https://az-face-cust-hack.azurewebsites.net/reconcile_profile/");
 
-    return response;
+    var request = new http.MultipartRequest("POST", url);
+    request.fields['profile_name'] = profName;
+    request.files.add(new http.MultipartFile.fromBytes('file', faceBytes,
+        filename: "prof.name"));
 
-    // var request = new http.MultipartRequest("POST", url);
-    // request.fields['uuid'] = 'nweiz@google.com';
-    // request.files.add(new http.MultipartFile.fromBytes('file', faceBytes));
-    // var response = await request.send();
+    var response = await request.send();
 
-    // response.
-    // // request.send().then((response) {
-    // //   if (response.statusCode == 200) print("Uploaded!");
-    // // });
+    if (response.statusCode == 200) print("Uploaded!");
 
-    // return response;
+    var rsp = await response.stream.bytesToString();
+    return rsp;
   }
 }
 
