@@ -2,7 +2,7 @@ version: '3.3'
 
 services:
   facerecon-api:
-    image: azfaceapi.azurecr.io/recon_api_test:0.0
+    image: azfaceapi.azurecr.io/recon_api_test:0.2
     container_name: facerecon-api
     environment:
       - PYTHONUNBUFFERED=1
